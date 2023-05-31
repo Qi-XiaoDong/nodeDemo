@@ -3,7 +3,7 @@
  */
 const getMsg = require("../utils/getSendResult");
 const { pathToRegexp } = require("path-to-regexp");
-
+const jwt = require("../utils/jwt");
 const whiteApis = [
   {
     method: "get",
@@ -31,14 +31,14 @@ module.exports = (req, res, next) => {
     return;
   }
 
-  const token = req.cookies.token || req.headers.authorization;
-  if (!token) {
-    nonTokenHandle(req, res, next);
-  } else {
-    // 校验token
-    // const userId = cryptor.decrypt(token);
-    req.userId = token;
+  // 校验token
+  const result = jwt.verify(req);
+  if (result) {
+    req.userId = result.id;
     next();
+  } else {
+    //认证失败
+    nonTokenHandle(req, res, next);
   }
 };
 
