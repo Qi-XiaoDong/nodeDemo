@@ -1,34 +1,17 @@
-const Koa = require('koa');
+const Koa = require("koa");
 const app = new Koa();
 
+// 静态资源
 
-// logger
-
-app.use(async (ctx, next) => {
-  await next();
-  const rt = ctx.response.get('X-Response-Time');
-  console.log(`${ctx.method} ${ctx.url} - ${rt}`);
-});
-
-// x-response-time
+const compose = require("koa-compose");
+const middlewareList = require("./middleware");
 
 app.use(async (ctx, next) => {
-  const start = Date.now();
+  ctx.body = "hello world";
   await next();
-  const ms = Date.now() - start;
-  ctx.set('X-Response-Time', `${ms}ms`);
 });
+app.use(compose(middlewareList));
 
-// response
-
-app.use(async ctx => {
-  ctx.body = 'Hello World';
+app.listen(3000,() => {
+  console.log("启动了")
 });
-
-
-// 错误处理
-app.on("error",() => {
-
-})
-
-app.listen(3000);
